@@ -1,24 +1,30 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 
-export default function App() {
+const accessKey = process.env.REACT_APP_UNSPLASH_API;
 
+export default function App() {
+  const [images, setImages] = useState([]);
+  
   // Unsplash API
   const count = 10;
   // Utilizing a Free UnSplash API key; please see https://unsplash.com/developers to create your own
-  const apiKey = REACT_APP_UNSPLASH_API;
+  const apiKey = accessKey;
   const apiUrl = `https://api.unsplash.com/photos/random?client_id=${apiKey}&count=${count}`;
-
-  console.log('before fetch');
 
   useEffect(() => {
     fetch(apiUrl)
-      .then(console.log('successful fetch'))
       .then(res => res.json())
-      .then(data => {
-        console.log(data);
-      })
+      .then(setImages);
   }, []);
+
+  // check for API
+  if (!accessKey) {
+    return (
+      <a href="https://unsplash.com/developers" className="error">API not found: Please apply for one</a>
+    )
+  }
+
   return (
     <div className="app">
       <h1>Unsplash Image Gallery!</h1>
@@ -29,9 +35,9 @@ export default function App() {
       </form>
 
       <div className="image-grid">
-        {[...Array(100)].map((_, index) => (
+        {images.map((image, index) => (
           <div className="image" key={index}>
-            <img src="https://placekitten.com/g/1920/1080" alt="Sample" />
+            <img src={image.urls.regular} alt={image.alt_description} />
           </div>
         ))}
       </div>
